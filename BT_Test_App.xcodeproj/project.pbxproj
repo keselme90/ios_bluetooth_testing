@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B386406267B1FE000500365 /* OnBoardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B386405267B1FE000500365 /* OnBoardingViewController.swift */; };
+		2B386408267B23CD00500365 /* OnBoardingCarSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B386407267B23CD00500365 /* OnBoardingCarSelectionViewController.swift */; };
+		2B38640A267B267900500365 /* BluetoothTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B386409267B267900500365 /* BluetoothTableViewCell.swift */; };
+		2B38640C267B286D00500365 /* BluetoothObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B38640B267B286D00500365 /* BluetoothObject.swift */; };
+		2B38640E267B52E300500365 /* MainScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B38640D267B52E300500365 /* MainScreenViewController.swift */; };
+		2B386412267B7EE600500365 /* NotConnectedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B386411267B7EE600500365 /* NotConnectedViewController.swift */; };
 		2B3D74D0264A64CA00907312 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D74CF264A64CA00907312 /* AppDelegate.swift */; };
 		2B3D74D4264A64CA00907312 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3D74D3264A64CA00907312 /* ViewController.swift */; };
 		2B3D74D7264A64CA00907312 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B3D74D5264A64CA00907312 /* Main.storyboard */; };
@@ -16,6 +22,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2B386405267B1FE000500365 /* OnBoardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoardingViewController.swift; sourceTree = "<group>"; };
+		2B386407267B23CD00500365 /* OnBoardingCarSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoardingCarSelectionViewController.swift; sourceTree = "<group>"; };
+		2B386409267B267900500365 /* BluetoothTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothTableViewCell.swift; sourceTree = "<group>"; };
+		2B38640B267B286D00500365 /* BluetoothObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothObject.swift; sourceTree = "<group>"; };
+		2B38640D267B52E300500365 /* MainScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenViewController.swift; sourceTree = "<group>"; };
+		2B386411267B7EE600500365 /* NotConnectedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotConnectedViewController.swift; sourceTree = "<group>"; };
 		2B3D74CC264A64CA00907312 /* BT_Test_App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BT_Test_App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B3D74CF264A64CA00907312 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B3D74D3264A64CA00907312 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -63,6 +75,12 @@
 				2B3D74D8264A64CC00907312 /* Assets.xcassets */,
 				2B3D74DA264A64CC00907312 /* LaunchScreen.storyboard */,
 				2B3D74DD264A64CC00907312 /* Info.plist */,
+				2B386405267B1FE000500365 /* OnBoardingViewController.swift */,
+				2B386407267B23CD00500365 /* OnBoardingCarSelectionViewController.swift */,
+				2B386409267B267900500365 /* BluetoothTableViewCell.swift */,
+				2B38640B267B286D00500365 /* BluetoothObject.swift */,
+				2B38640D267B52E300500365 /* MainScreenViewController.swift */,
+				2B386411267B7EE600500365 /* NotConnectedViewController.swift */,
 			);
 			path = BT_Test_App;
 			sourceTree = "<group>";
@@ -137,9 +155,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B38640A267B267900500365 /* BluetoothTableViewCell.swift in Sources */,
 				2B3D74D4264A64CA00907312 /* ViewController.swift in Sources */,
+				2B386412267B7EE600500365 /* NotConnectedViewController.swift in Sources */,
+				2B386408267B23CD00500365 /* OnBoardingCarSelectionViewController.swift in Sources */,
 				2BA808C42653FD6F0063D293 /* TableViewCell.swift in Sources */,
+				2B38640C267B286D00500365 /* BluetoothObject.swift in Sources */,
+				2B38640E267B52E300500365 /* MainScreenViewController.swift in Sources */,
 				2B3D74D0264A64CA00907312 /* AppDelegate.swift in Sources */,
+				2B386406267B1FE000500365 /* OnBoardingViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

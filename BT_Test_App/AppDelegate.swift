@@ -34,25 +34,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return paths[0]
     }
-    
-    func applicationDidEnterBackground(_ application: UIApplication) {
-        
-        print("applicationDidEnterBackground")
-        
-//        let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
-//        let peripheralArray = centralManager?.retrievePeripherals(withIdentifiers: uuids)
-//
-//        print("peripherals = ", peripheralArray)
-    }
-    
-    func applicationWillResignActive(_ application: UIApplication) {
-        
-        print("applicationWillResignActive")
-//        let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
-//        let peripheralArray = centralManager?.retrievePeripherals(withIdentifiers: uuids)
-        
-//        print("peripherals = ", peripheralArray)
-    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -78,7 +59,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         setupNotifications()
         
+        // check if we are connected to our car
+        let userDefaults = UserDefaults.standard
+        let userConfirmation = userDefaults.object(forKey: "user_car_confirmation")as? String ?? ""
+        if((userConfirmation) != "") {
+            
+                self.window!.rootViewController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateInitialViewController()
+        }
+        else {
+            
+            let rootController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "OnboardingViewController")
+            let navigation = UINavigationController(rootViewController: rootController)
 
+            self.window!.rootViewController = navigation
+        }
+        
         return true
     }
 
@@ -108,12 +103,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("AppDelegate: handleRouteChange () --> new device available")
             for output in session.currentRoute.outputs {
                 
+                /// Write data to user details
+                    let deviceName = output.portName.description
+                    let deviceUid = output.uid.description
+                    let dataToWrite = deviceName + "," + deviceUid
+                    
+                    let userDefaults = UserDefaults.standard
+                    var strings: [String] = userDefaults.object(forKey: "av_session_devices") as? [String] ?? []
+                    
+                    strings.append(dataToWrite)
+                    userDefaults.set(strings, forKey: "av_session_devices")
+                
+                // End of saving to user details
+                
                 let content = UNMutableNotificationContent()
-                content.title = "New device available"
-                content.body = "connected to " + output.description
+                content.title = "התחברות חדשה זוהתה"
+                content.body = "התחברת אל  " + output.portName.description + " הקלטה התחילה"
                 
                 let uuidString = UUID().uuidString
-                let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: nil)
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+                let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: trigger)
                 
                 notificationCenter.add(request, withCompletionHandler: nil)
                 
@@ -147,11 +156,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 for output in previousRoute.outputs  {
                     
                     let content = UNMutableNotificationContent()
-                    content.title = "Device is unavailable"
-                    content.body = "disconnected from " + output.description
+                    content.title = "התנתקות חדשה זוהתה"
+                    content.body = "התנתקת מ  " + output.portName.description + "הקלטה נעצרה"
                     
                     let uuidString = UUID().uuidString
-                    let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: nil)
+                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+                    let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: trigger)
                     
                     notificationCenter.add(request, withCompletionHandler: nil)
                     
@@ -220,7 +230,7 @@ extension  AppDelegate : CBPeripheralDelegate, CBCentralManagerDelegate {
         content.sound = .default
 
         // 2
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         let request = UNNotificationRequest(identifier: "1111", content: content, trigger: trigger)
 
         // 3
@@ -253,7 +263,7 @@ extension  AppDelegate : CBPeripheralDelegate, CBCentralManagerDelegate {
         content.sound = .default
 
         // 2
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         let request = UNNotificationRequest(identifier: "2222", content: content, trigger: trigger)
 
         // 3
@@ -318,7 +328,7 @@ extension AppDelegate: CLLocationManagerDelegate {
             content.sound = .default
 
             // 2
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
             let request = UNNotificationRequest(identifier: "3333", content: content, trigger: trigger)
 
             // 3
@@ -366,7 +376,7 @@ extension AppDelegate: CLLocationManagerDelegate {
     content.sound = .default
 
     // 2
-    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
     let request = UNNotificationRequest(identifier: NSDate().timeIntervalSince1970.description, content: content, trigger: trigger)
 
     // 3
