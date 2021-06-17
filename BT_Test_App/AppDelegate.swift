@@ -39,17 +39,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         print("applicationDidEnterBackground")
         
-        let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
-        let peripheralArray = centralManager?.retrievePeripherals(withIdentifiers: uuids)
-        
+//        let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
+//        let peripheralArray = centralManager?.retrievePeripherals(withIdentifiers: uuids)
+//
 //        print("peripherals = ", peripheralArray)
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
         
         print("applicationWillResignActive")
-        let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
-        let peripheralArray = centralManager?.retrievePeripherals(withIdentifiers: uuids)
+//        let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
+//        let peripheralArray = centralManager?.retrievePeripherals(withIdentifiers: uuids)
         
 //        print("peripherals = ", peripheralArray)
     }
@@ -90,6 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                selector: #selector(handleRouteChange),
                                                name: AVAudioSession.routeChangeNotification,
                                                object: AVAudioSession.sharedInstance())
+        
     }
     
     @objc func handleRouteChange(notification: NSNotification) {
@@ -99,14 +100,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return
         }
         
-        let content = UNMutableNotificationContent()
-        content.title = "Notification Title"
-        content.body = "Notification Body"
-        
-        let uuidString = UUID().uuidString
-        let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: nil)
-        
-        notificationCenter.add(request, withCompletionHandler: nil)
         
         switch reason {
         
@@ -114,15 +107,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let session = AVAudioSession.sharedInstance()
             print("AppDelegate: handleRouteChange () --> new device available")
             for output in session.currentRoute.outputs {
+                
+                let content = UNMutableNotificationContent()
+                content.title = "New device available"
+                content.body = "connected to " + output.description
+                
+                let uuidString = UUID().uuidString
+                let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: nil)
+                
+                notificationCenter.add(request, withCompletionHandler: nil)
+                
 //                headphonesConnected = true
                 print("output port type = ", output.portType, " output port name = ", output.portName, " full output = ", output)
                 
                 let timestamp = NSDate().timeIntervalSince1970
-                let name = "AVAudioSession_newDeviceAvailable_" + timestamp.description + ".txt"
+                let name = "AVAudioSession_newDeviceAvailable_" + "date_" + Date().description + "desctiption_" + timestamp.description + ".txt"
                 let fileName = getDocumentsDirectory().appendingPathComponent(name)
                 
                 do {
-                    let str = "AVAudioSession_newDeviceAvailable_" + output.description
+                    let str = "AVAudioSession_newDeviceAvailable_" + "date_" + Date().description + "_output_" + output.description
                     try str.write(to: fileName, atomically: true, encoding: String.Encoding.utf8)
                 } catch {
                     // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
@@ -138,17 +141,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
         case .oldDeviceUnavailable:
             print("AppDelegate: handleRouteChange () --> old device unavailable")
+            
             if let previousRoute =
                 userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
                 for output in previousRoute.outputs  {
+                    
+                    let content = UNMutableNotificationContent()
+                    content.title = "Device is unavailable"
+                    content.body = "disconnected from " + output.description
+                    
+                    let uuidString = UUID().uuidString
+                    let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: nil)
+                    
+                    notificationCenter.add(request, withCompletionHandler: nil)
+                    
 //                    headphonesConnected = false
                     
                     let timestamp = NSDate().timeIntervalSince1970
-                    let name = "AVAudioSession_newDeviceAvailable_" + timestamp.description + ".txt"
+                    let name = "AVAudioSession_newDeviceUnavailable_" + "date_" + Date().description + "_timestamp" + timestamp.description + ".txt"
                     let fileName = getDocumentsDirectory().appendingPathComponent(name)
                     
                     do {
-                        let str = "AVAudioSession_newDeviceAvailable_" + output.description
+                        let str = "AVAudioSession_newDeviceUnavailable_" + output.description + "_date_" + Date().description
                         try str.write(to: fileName, atomically: true, encoding: String.Encoding.utf8)
                     } catch {
                         // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
@@ -308,7 +322,7 @@ extension AppDelegate: CLLocationManagerDelegate {
             let request = UNNotificationRequest(identifier: "3333", content: content, trigger: trigger)
 
             // 3
-            notificationCenter.add(request, withCompletionHandler: nil)
+//            notificationCenter.add(request, withCompletionHandler: nil)
         }
         let uuids = [UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
         let peripherals = centralManager?.retrievePeripherals(withIdentifiers: uuids)
@@ -356,10 +370,14 @@ extension AppDelegate: CLLocationManagerDelegate {
     let request = UNNotificationRequest(identifier: NSDate().timeIntervalSince1970.description, content: content, trigger: trigger)
 
     // 3
-    notificationCenter.add(request, withCompletionHandler: nil)
+//    notificationCenter.add(request, withCompletionHandler: nil)
 
 //    let location = Location(visit: visit, descriptionString: description)
 
     // Save location to disk
   }
 }
+
+
+
+/// BC:42:8C:7A:D8:1C-tacl

@@ -30,11 +30,61 @@ class ViewController: UIViewController, CBPeripheralDelegate, CBCentralManagerDe
         }
     }
     
+    @IBAction func fetchLocal(_ sender: Any) {
+        
+        let userDefaults = UserDefaults.standard
+        let uuids = userDefaults.object(forKey: "service-uuid-array")as? [String] ?? [String]()
+        print ("retrieved uuids = ", uuids)
+        
+        if(uuids.count == 0) {
+            print("fetched 0 services from local storage")
+        } else {
+            print("fetched " + uuids.count.description + " services from local storage")
+            
+            var cbbuids = [CBUUID]()
+            for uuid in uuids {
+                cbbuids.append(CBUUID(string:uuid))
+            }
+            
+            let connectedPeripherals = centralManager?.retrieveConnectedPeripherals(withServices: cbbuids)as? [CBPeripheral] ?? [CBPeripheral]()
+            
+            print("connected peripherals ", connectedPeripherals)
+            
+            if(connectedPeripherals.count > 0) {
+                
+                let peripheral = connectedPeripherals[0];
+                
+                connectedPeripheral = peripheral
+                
+                let alert = UIAlertController(title: "Connected Peripheral Found", message: "Found peripheral " + peripheral.description, preferredStyle: UIAlertController.Style.alert)
+                
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: {action in
+                    
+                    self.centralManager?.connect(self.connectedPeripheral!, options: nil)
+                }))
+
+                // show the alert
+                self.present(alert, animated: true, completion: nil)
+                
+            }
+            else {
+                print("didn't find any connected peripherals")
+                
+                let alert = UIAlertController(title: "Connected Peripheral NOT Found", message: "Failed to find peripherals with given services", preferredStyle: UIAlertController.Style.alert)
+                
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+
+                // show the alert
+                self.present(alert, animated: true, completion: nil)
+            }
+            
+        }
+        
+    }
+    
     @IBAction func startScanning(_ sender: Any) {
         
         if(self.isBluetoothOn) {
-            
-//            self.centralManager?.scanForPeripherals(withServices: [CBUUID(string: "0BD95D98-D979-67DA-F3AA-C6C03781E70B"), CBUUID(string: "0xFE8F"), CBUUID(string: "FE8F"), CBUUID(string: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")], options: [CBCentralManagerScanOptionAllowDuplicatesKey:true])
             
             self.centralManager?.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey:true])
             
@@ -73,27 +123,7 @@ class ViewController: UIViewController, CBPeripheralDelegate, CBCentralManagerDe
                 print("poweredOn")
                 
                 self.isBluetoothOn = true;
-                
-//                let connected = centralManager?.retrieveConnectedPeripherals(withServices: [CBUUID(string: "65786365-6C70-6F69-6E74-2E636F6D0000"), CBUUID(string: "FE8F")])
-                
-//                print("connected = ", connected)
-                
-//                self.centralManager?.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey:true])
-                
-//                var connectionEventsOptions = [
-//                    CBConnectPeripheralOptionNotifyOnConnectionKey:true]
-                
-//                self.centralManager?.registerForConnectionEvents(options: connectionEventsOptions)
-                
-//                self.centralManager?.scanForPeripherals(withServices: [], options: [CBCentralManagerScanOptionAllowDuplicatesKey:true])
-                
-//                let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
-//                let peripherals = centralManager?.retrievePeripherals(withIdentifiers: uuids)
-//                print("peripherals: ", peripherals)
-//
-//                let connectedPeripherals = centralManager?.retrieveConnectedPeripherals(withServices: [CBUUID(string: "0x0000"), CBUUID(string: "0x6666")])
-//                print("connected peripherals = ", connectedPeripherals)
-                
+                                
                 break
             @unknown default:
                 print("default")
@@ -108,11 +138,26 @@ class ViewController: UIViewController, CBPeripheralDelegate, CBCentralManagerDe
                return
        }
         print("services = ", peripheral.services)
-//       discoverCharacteristics(peripheral: peripheral)
         
-        let connected = centralManager?.retrieveConnectedPeripherals(withServices: [CBUUID(string: "65786365-6C70-6F69-6E74-2E636F6D0000")])
+        var serviceUUIDArray = [String]()
+        for service in peripheral.services! {
+            print("service uuid = ", service.uuid.uuidString)
+            serviceUUIDArray.append(service.uuid.uuidString)
+        }
         
-        print("connected = ", connected)
+        print("serviceUUIDArray = ", serviceUUIDArray)
+        
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(serviceUUIDArray, forKey: "service-uuid-array")
+        
+        // create the alert
+        let alert = UIAlertController(title: "Services Dound", message: "Found " + peripheral.services!.count.description + " services and saved them to local storage", preferredStyle: UIAlertController.Style.alert)
+
+        // add an action (button)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+
+        // show the alert
+        self.present(alert, animated: true, completion: nil)
     }
     
     
@@ -122,36 +167,31 @@ class ViewController: UIViewController, CBPeripheralDelegate, CBCentralManagerDe
         self.connectedPeripheral = peripheral
         peripheral.delegate = self
         
-//        peripheral.discoverServices(nil)
+        self.centralManager?.stopScan();
+        print("scan stopped")
         
-//        let connected = centralManager?.retrieveConnectedPeripherals(withServices: [CBUUID(string: "65786365-6C70-6F69-6E74-2E636F6D0000")])
-//
-//        print("connected = ", connected)
+        peripheral.discoverServices(nil)
         
-//        let connectedPeripherals = centralManager?.retrieveConnectedPeripherals(withServices: [CBUUID(string: "0x0000"), CBUUID(string: "0x6666")])
-//        print("connected peripherals = ", connectedPeripherals)
-//
-//        let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
-//        let peripherals = centralManager?.retrievePeripherals(withIdentifiers: uuids)
-//        print("peripherals: \(peripherals)")
-        
+        let alert = UIAlertController(title: "Peripheral Connected", message: "Connected to " + connectedPeripheral!.description + " services and saved them to local storage", preferredStyle: UIAlertController.Style.alert)
+
+        // add an action (button)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+
+        // show the alert
+        self.present(alert, animated: true, completion: nil)
+                
     }
     
     func centralManager(_ central: CBCentralManager, connectionEventDidOccur event: CBConnectionEvent, for peripheral: CBPeripheral) {
         print("connection event did occur with = ", peripheral)
-        
-        let connectedPeripherals = centralManager?.retrieveConnectedPeripherals(withServices: [CBUUID(string: "0x0000"), CBUUID(string: "0x6666")])
-        print("connected peripherals = ", connectedPeripherals)
-        
-//        let connectedPeripherals = centralManager?.retrieveConnectedPeripherals(withServices: [CBUUID(string: "0x0000")])
-//        print("connected peripherals = ", connectedPeripherals)
-        
-//        let peripherals = centralManager?.retrievePeripherals(withIdentifiers: [])
-//        print("peripherals = ", peripherals)
     }
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
 
+        if(peripheral.name == nil) {
+            return
+        }
+        
         print("*******************************\nperipheral identifier = ", peripheral.identifier)
         
         print("discovered peripheral = ", peripheral)
@@ -162,7 +202,6 @@ class ViewController: UIViewController, CBPeripheralDelegate, CBCentralManagerDe
         }
 
         if(peripheralsArray.contains(where: { $0.identifier == peripheral.identifier})) {
-//            peripheralsArray.append(peripheral)
             
             if let row = self.peripheralsArray.firstIndex(where: {$0.identifier == peripheral.identifier}) {
                    peripheralsArray[row] = peripheral
@@ -176,24 +215,7 @@ class ViewController: UIViewController, CBPeripheralDelegate, CBCentralManagerDe
             peripheralsTableView.reloadData()
             
         }
-        
-        // 7E34D617-731F-616E-8C89-5729870CDD5E samsung phone
-        // 0BD95D98-D979-67DA-F3AA-C6C03781E70B // jbl
-        
-//        if(peripheral.identifier.uuidString == "0BD95D98-D979-67DA-F3AA-C6C03781E70B") {
-//            self.peripheral = peripheral
-//            self.peripheral?.delegate = self
-//
-//            centralManager?.connect(peripheral, options: nil)
-//            centralManager?.stopScan()
-//
-//            let uuids = [UUID(uuidString: "7E34D617-731F-616E-8C89-5729870CDD5E"), UUID(uuidString: "0BD95D98-D979-67DA-F3AA-C6C03781E70B")].compactMap({ $0 })
-//            let peripherals = centralManager?.retrievePeripherals(withIdentifiers: uuids)
-//            print("peripherals: \(peripherals)")
-//
-//            print("stopping scan")
-//        }
-        
+            
         print("*******************************\n")
         
      }
@@ -216,24 +238,9 @@ class ViewController: UIViewController, CBPeripheralDelegate, CBCentralManagerDe
 extension ViewController: UITableViewDelegate {
  
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        print("you tapped me!")
         
         let peripheral = peripheralsArray[indexPath.row];
         centralManager?.connect(peripheral, options: nil)
-        
-//        let defaults = UserDefaults.standard;
-        //        defaults.set(peripheral, forKey: "car_network");
-        
-//        Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { timer in
-////            let randomNumber = Int.random(in: 1...20)
-////            print("Number: \(randomNumber)")
-////
-////            if randomNumber == 10 {
-////                timer.invalidate()
-////            }
-//            print("calling connect in sqeuled task")
-//            self.centralManager?.connect(peripheral, options: nil)
-//        }
 
     }
 }
